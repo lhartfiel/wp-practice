@@ -12,3 +12,11 @@ License URI: http://opensource.org/licenses/MIT
 body {
 	background: white;
 }
+
+html {
+	margin: 0 auto;
+}
+
+h1 {
+	margin: 0 auto;
+}
