@@ -41,6 +41,7 @@
     </header><!-- .entry-header -->
   
     <p><?php _e( "We can&#039;t find content for this page!", "mytheme" ); ?></p>
+    ul>li*7
   </article><!-- #post-0 -->
 <?php } ?> <!-- end else -->
 
