@@ -10,7 +10,7 @@ var gulp = require('gulp'),
     server = lr();
 
  gulp.task('styles', function(){
-  return sass('scss/') 
+  return sass('assets/scss/') 
       .on('error', function (err) {
           console.error('Error!', err.message);
       })
@@ -42,9 +42,9 @@ gulp.task('watch', function() {
       }
   
       // Watch .scss files
-      gulp.watch('scss/*.scss', ['styles']);
-      gulp.watch('scss/**/*.scss', ['styles']);
-      gulp.watch('assets/images/originals/**', ['images']);
+      gulp.watch('assets/scss/*.scss', ['styles']);
+      gulp.watch('assets/scss/**/*.scss', ['styles']);
+      gulp.watch('assets/assets/images/originals/**', ['images']);
   
     });
 
