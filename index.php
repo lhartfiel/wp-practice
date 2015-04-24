@@ -15,9 +15,18 @@
 <section id="primary" role="main">
 
 <?php if( have_posts() ) { ?>
+  <!-- there IS content for this query -->
 
-	<?php while( have_posts() ) { //start the loop
-		the_post() ?>
+  <?php if(is_archive()) { //check if we're on an archive page
+      get_template_part('custom_modules/archive', 'header');
+      }
+  ?>
+  
+
+	<?php //Start the loop
+    while( have_posts() ) { //start the loop
+		the_post() 
+  ?>
 
 	 	 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
         <header class="entry-header">

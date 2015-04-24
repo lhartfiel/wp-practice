@@ -1,33 +1,28 @@
 <?php
 /**
- * The functions template
+ * Theme functions and definitions
  *
  * Sets up the theme and provides some helper functions including 
- * custom template tags, actions and filter hooks to change core functionality. These are only applied once a theme is activated. For more global use, plugins should be used.
+ * custom template tags, actions and filter hooks to change core functionality.
  *
- * @package mytheme
+ *
+ * @package My Theme
  */
-?>
-
-<?php  
 
 /**
  * Set the content width based on the theme's design and stylesheet.
  */
-if( ! isset( $content_width ) ) {
-	$content_width = 600;
-}
+if ( ! isset( $content_width ) ) {
+    $content_width = 600;
+}; //endif
 
-if ( ! function_exists( 'mytheme_setup' ) ) {
-    function mytheme_setup() {
 
-    /*
-     * Make theme available for translation.
-     * Translations can be filed in the /languages/ directory.
-     */
-    load_theme_textdomain( 'mytheme', get_template_directory() . '/languages' );
+function starter_theme_setup() {
+  // Make theme available for translation.
+      // Translations can be filed in the /languages/ directory.
+      load_theme_textdomain( 'mytheme', get_template_directory() . '/languages' );
 
-    // Add default posts and comments RSS feed links to head.
+      // Add default posts and comments RSS feed links to head.
       add_theme_support( 'automatic-feed-links' );
 
       // Enable support for Post Thumbnails on posts and pages
@@ -53,22 +48,25 @@ if ( ! function_exists( 'mytheme_setup' ) ) {
       // Enable support for editable menus via Appearance > Menus
       register_nav_menus( array(
           'primary' => __( 'Primary Menu', 'mytheme' ),
-          'footer' => __( 'Footer Menu', 'mytheme')
       ) );
 
       // Add custom image sizes
       // add_image_size( 'name', 500, 300, true );
+}
 
-    }
-} // endif mytheme_setup
+add_action( 'after_setup_theme', 'starter_theme_setup' );
 
-add_action( 'after_setup_theme', 'mytheme_setup' );
 
+// Enable support for editable menus via Appearance > Menus
+register_nav_menus( array(
+    'primary' => __( 'Primary Menu', 'mytheme' ),
+    // 'footer' => __( 'Footer Menu', 'starter-theme' ),
+) );
 
 /**
  * Register sidebars and widgetized areas
  */
-function mytheme_widgets_init() {
+function starter_theme_widgets_init() {
     register_sidebar( array(
         'name' => __( 'Sidebar', 'mytheme' ),
         'id' => 'sidebar-1',
@@ -78,14 +76,13 @@ function mytheme_widgets_init() {
         'after_title' => '</h3>',
     ) );
 }
-add_action( 'widgets_init', 'mytheme_widgets_init' );
-
+add_action( 'widgets_init', 'starter_theme_widgets_init' );
 
 /* ENQUEUE SCRIPTS & STYLES
  ========================== */
-function mytheme_scripts() {
+function starter_theme_scripts() {
     // theme style.css file
-    wp_enqueue_style( 'mytheme-style', get_stylesheet_uri() );
+    wp_enqueue_style( 'starter-theme-style', get_stylesheet_uri() );
 
     // threaded comments
     if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
@@ -106,15 +103,91 @@ function mytheme_scripts() {
 }    
 add_action('wp_enqueue_scripts', 'starter_theme_scripts');
 
+//this sets the posts per page based of ALL archive pages
+// function starter_theme_custom_query( $query ) {
+//     if ( is_archive() && !is_admin() ) {
+//          $query->set( 'posts_per_page', 18 );
+//     }
+//     return $query;
+// }
+// add_filter( 'pre_get_posts', 'starter_theme_custom_query' );
 
-// Add TinyMCE buttons that are disabled by default
-//function themeFunction_mce_buttons_2($buttons) {  
-//  /**
-//   * Add in a core button that's disabled by default
-//   */
-//  $buttons[] = 'justify'; // fully justify text
-//  $buttons[] = 'hr'; // insert HR
-//
-//  return $buttons;
-//}
-//add_filter('mce_buttons_2', 'themeFunction_mce_buttons_2');
+
+//this orders the query by title and returns results in ascending order
+// function starter_theme_custom_query( $query ) {
+//     if ( is_category( 'Locations' ) && !is_admin() ) {
+//          $query->set( 'orderby', 'title' );
+//          $query->set( 'order', 'ASC' );
+//     }
+//     return $query;
+// }
+// add_filter( 'pre_get_posts', 'starter_theme_custom_query' );
+
+
+//function for comments
+if ( ! function_exists( 'starter_theme_comment' ) ) :
+
+function starter_theme_comment( $comment, $args, $depth ) {
+    $GLOBALS['comment'] = $comment;
+    switch ( $comment->comment_type ) :
+        case 'pingback' :
+        case 'trackback' :
+    ?>
+    <li class="post pingback">
+        <p><?php _e( 'Pingback:', 'starter-theme' ); ?> <?php comment_author_link(); ?><?php edit_comment_link( __( 'Edit', 'starter-theme' ), '<span class="edit-link">', '</span>' ); ?></p>
+    <?php
+            break;
+        default :
+    ?>
+    <li <?php comment_class(); ?> id="li-comment-<?php comment_ID(); ?>">
+        <article id="comment-<?php comment_ID(); ?>" class="comment">
+            <header class="comment-meta">
+                <div class="comment-author vcard">
+                    <?php
+                        $avatar_size = 35;
+                        echo get_avatar( $comment, $avatar_size );
+
+                        /* translators: 1: comment author, 2: date and time */
+                        printf( __( '%1$s %2$s', 'starter-theme' ),
+                            sprintf( '<span class="fn">%s</span>', get_comment_author_link() ),
+                            sprintf( '<time pubdate datetime="%2$s">%3$s</time>',
+                                esc_url( get_comment_link( $comment->comment_ID ) ),
+                                get_comment_time( 'c' ),
+                                /* translators: 1: date, 2: time */
+                                sprintf( __( '%1$s at %2$s', 'starter-theme' ), get_comment_date(), get_comment_time() )
+                            )
+                        );
+                    ?>
+
+                </div><!-- .comment-author .vcard -->
+
+                <?php if ( $comment->comment_approved == '0' ) : ?>
+                    <em class="comment-awaiting-moderation"><?php _e( 'Your comment is awaiting moderation.', 'starter-theme' ); ?></em>
+                    <br />
+                <?php endif; ?>
+            </header>
+
+            <div class="comment-content"><?php comment_text(); ?></div>
+
+            <div class="reply">
+                <?php comment_reply_link( array_merge( $args, array( 'reply_text' => __( 'Reply', 'starter-theme' ), 'depth' => $depth, 'max_depth' => $args['max_depth'] ) ) ); ?>
+            </div><!-- .reply -->
+        </article><!-- #comment-## -->
+
+    <?php
+            break;
+    endswitch;
+
+}
+endif; // ends check for starter_theme_comment()
+
+
+function starter_theme_custom_query( $query ) {
+    if ( is_archive() && !is_admin() ) {
+         $query->set('posts_per_page', 12);
+         // $query->set( 'nopaging', true ); //no pagination is shown
+         // $query->set('posts_per_archive_page', 4); //override specific to is_archive() and is_search() displays
+    }
+    return $query;
+}
+add_filter( 'pre_get_posts', 'starter_theme_custom_query' );
